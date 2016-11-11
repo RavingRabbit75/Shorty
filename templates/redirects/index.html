@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>View Messages for: {{user.first_name}}</h1>
+	
+	<div class="newBtn">
+		<a href="/users/{{user.id}}">
+			<button class="btn btn-default">Back</button>
+		</a>
+		<a href="/users/{{user.id}}/messages/new">
+			<button class="btn btn-default">New Message</button>
+		</a>
+	</div>
+	
+	<div id="titleDividerLine"></div>
+	{% for message in messages %}
+		<div class="userBox infoBox">
+			<div class="col-xs-10">
+				<div class="fullName">{{message.content}}</div>
+			</div>
+			<div class="col-xs-2 viewBtn">
+				<a href="/users/{{user.id}}/messages/{{message.id}}"><button class="btn btn-default">View</button></a>
+			</div>
+		</div>
+	{% endfor %}
+{% endblock %}

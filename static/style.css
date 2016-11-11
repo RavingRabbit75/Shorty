@@ -1,0 +1,63 @@
+h1 {
+	font-family: sans-serif;
+}
+#newUserBtn{
+	position:relative;
+	left: 300px;
+	top:-48px;
+	margin-bottom: 0px
+}
+.userBox{
+	margin-bottom: 15px
+}
+.fullName {
+	font-family: sans-serif;
+	font-size: 20px
+}
+.subInfo {
+	font-family: sans-serif;
+	font-size: 12px
+}
+
+.infoBox {
+	border-bottom: 1px solid #CCCCCC;
+	height:60px;
+}
+
+.viewBtn {
+	text-align: center;
+}
+
+#titleDividerLine{
+	border-bottom: 1px solid #CCCCCC;
+	margin-bottom: 20px
+}
+
+.spanText{
+	margin-right:40px;
+}
+
+/*---------------------*/
+
+.viewBox{
+	position: relative;
+	top:20px;
+	/*border-bottom: 1px solid #CCCCCC;*/
+	height: 50px;
+}
+
+.viewBtn2{
+	text-align: right;
+	top:5px;
+	/*border: 1px dashed green;*/
+}
+
+#deleteBtnForm{
+	display: inline;
+}
+
+
+.newBtn{
+	text-align: right;
+	margin-bottom: 10px;
+}
