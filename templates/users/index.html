@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>Messages</h1>
+	<h1>Shorty</h1>
 	
 	<div class="newBtn">
 		<a href="/users/new">
@@ -12,10 +12,7 @@
 	{% for user in users %}
 		<div class="userBox infoBox">
 			<div class="col-xs-10">
-				<div class="fullName">{{user.first_name+" "+user.last_name}}</div>
-				<div class="subInfo">
-					<span class="spanText">{{"Username: "+user.username}}</span><span >{{"Email: "+user.email}}</span>
-				</div>
+				<div class="fullName">{{user.username}}</div>
 			</div>
 			<div class="col-xs-2 viewBtn">
 				<a href="/users/{{user.id}}"><button class="btn btn-default">View</button></a>

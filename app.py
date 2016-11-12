@@ -106,10 +106,13 @@ def edit(id):
 
 @app.route("/users/<int:id>/redirects", methods=["GET","POST"])
 def redirects_index(id):
+	from IPython import embed; embed()
 	if request.method=="POST":
-		new_redirect=Redirect(request.form["new_redirect"],id)
-		db.session.add(new_redirect)
-		db.session.commit()
+
+
+		new_redirect=Redirect(request.form["new_title"],request.form["new_url"])
+		# db.session.add(new_redirect)
+		# db.session.commit()
 
 	found_redirects=User.query.get(id).redirects.all()
 	found_user=User.query.get(id)
