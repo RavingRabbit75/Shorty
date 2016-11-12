@@ -110,7 +110,6 @@ def edit(id):
 @app.route("/users/<int:id>/redirects", methods=["GET","POST"])
 def redirects_index(id):
 	redirect_id = random_id.random_id_generator();
-	# from IPython import embed; embed()
 
 	if request.method=="POST":
 		new_redirect=Redirect(redirect_id,request.form["new_title"],request.form["new_url"],id)
@@ -137,7 +136,6 @@ def redirects_show(id, redirect_id):
 	found_user=User.query.get(id)
 	# if found_redirect==None:	
 	# 	return render_template("404.html"), 404
-
 
 	if request.method == b"PATCH":
 		found_redirect.url = request.form["original_url"]
