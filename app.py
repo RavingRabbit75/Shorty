@@ -169,7 +169,6 @@ def redirects_edit(id,redirect_id):
 @app.route("/go/<redirect_id>")
 def go_to_redirect(redirect_id):
 	found_redirect=Redirect.query.get(redirect_id)
-	print(found_redirect.url)
 	return redirect(found_redirect.url, code=302)
 
 
