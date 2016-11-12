@@ -9,12 +9,13 @@ app = Flask(__name__)
 # If we are in production, make sure we DO NOT use the debug mode
 if os.environ.get('ENV') == 'production':
     debug = False
-
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     # Heroku gives us an environment variable called DATABASE_URL when we add a postgres database
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 
 else:
     debug = True
+    app.config['SECRET_KEY'] = "abcdefghijk1234"
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/bitlyClone'
 
 
@@ -161,6 +162,7 @@ def redirects_edit(id,redirect_id):
 	return render_template("redirects/edit.html", redirect=found_redirect, user=found_user)
 
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
@@ -171,7 +173,7 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(debug=debug)
 
 
 
