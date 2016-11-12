@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request, url_for
 from flask_modus import Modus
 from flask_sqlalchemy import SQLAlchemy
 import os
+import random_id
 
 app = Flask(__name__)
 
@@ -45,7 +46,8 @@ class Redirect(db.Model):
 	title=db.Column(db.Text)
 	user_id=db.Column(db.Integer, db.ForeignKey("users.id"))
 
-	def __init__(self, url, title, user_id):
+	def __init__(self, id, url, title, user_id):
+		self.id = id
 		self.url = url
 		self.title = title
 		self.user_id = user_id
@@ -106,16 +108,18 @@ def edit(id):
 
 @app.route("/users/<int:id>/redirects", methods=["GET","POST"])
 def redirects_index(id):
-	from IPython import embed; embed()
+	redirect_id = random_id.random_id_generator();
+	# from IPython import embed; embed()
+
 	if request.method=="POST":
+		new_redirect=Redirect(redirect_id,request.form["new_title"],request.form["new_url"],id)
+		db.session.add(new_redirect)
+		db.session.commit()
 
-
-		new_redirect=Redirect(request.form["new_title"],request.form["new_url"])
-		# db.session.add(new_redirect)
-		# db.session.commit()
 
 	found_redirects=User.query.get(id).redirects.all()
 	found_user=User.query.get(id)
+
 	return render_template("redirects/index.html", redirects=found_redirects, user=found_user)
 
 
@@ -137,6 +141,7 @@ def redirects_show(id, redirect_id):
 	if request.method == b"PATCH":
 		found_redirect.url = request.form["original_url"]
 		found_redirect.title = request.form["title"]
+		found_redirect.user_id = id
 		db.session.add(found_redirect)
 		db.session.commit()
 		return redirect(url_for('redirects_index', id=id))
