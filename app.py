@@ -156,6 +156,7 @@ def redirects_edit(id,redirect_id):
 	return render_template("redirects/edit.html", redirect=found_redirect, user=found_user)
 
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
