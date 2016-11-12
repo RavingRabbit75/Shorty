@@ -112,7 +112,7 @@ def redirects_index(id):
 	redirect_id = random_id.random_id_generator();
 
 	if request.method=="POST":
-		new_redirect=Redirect(redirect_id,request.form["new_title"],request.form["new_url"],id)
+		new_redirect=Redirect(redirect_id,request.form["new_url"],request.form["new_title"],id)
 		db.session.add(new_redirect)
 		db.session.commit()
 
@@ -130,16 +130,21 @@ def redirects_new(id):
 	return render_template("redirects/new.html", user=found_user)
 
 
+
 @app.route("/users/<int:id>/redirects/<redirect_id>", methods=["GET", "PATCH", "DELETE"])
 def redirects_show(id, redirect_id):
 	found_redirect=Redirect.query.get(redirect_id)
 	found_user=User.query.get(id)
+	if os.environ.get('ENV')=="production":
+		url_header="http://"
+	else:
+		url_header="http://localhost:5000/go/"
 	# if found_redirect==None:	
 	# 	return render_template("404.html"), 404
 
 	if request.method == b"PATCH":
-		found_redirect.url = request.form["original_url"]
-		found_redirect.title = request.form["title"]
+		found_redirect.url = request.form["new_url"]
+		found_redirect.title = request.form["new_title"]
 		found_redirect.user_id = id
 		db.session.add(found_redirect)
 		db.session.commit()
@@ -150,15 +155,22 @@ def redirects_show(id, redirect_id):
 		db.session.commit()
 		return redirect(url_for('redirects_index', id=id))
 
-	return render_template("redirects/show.html", redirect=found_redirect, user=found_user)
+	return render_template("redirects/show.html", redirect=found_redirect, user=found_user, urlheader=url_header)
 
 
 @app.route("/users/<int:id>/redirects/<redirect_id>/edit")
 def redirects_edit(id,redirect_id):
 	found_user=User.query.get(id)
 	found_redirect=Redirect.query.get(redirect_id)
+	
 	return render_template("redirects/edit.html", redirect=found_redirect, user=found_user)
 
+
+@app.route("/go/<redirect_id>")
+def go_to_redirect(redirect_id):
+	found_redirect=Redirect.query.get(redirect_id)
+	print(found_redirect.url)
+	return redirect(found_redirect.url, code=302)
 
 
 @app.errorhandler(404)

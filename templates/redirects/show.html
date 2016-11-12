@@ -4,8 +4,9 @@
 	<h1>View Redirect</h1>
 	<div class="viewBox">
 		<div class="col-xs-6">
-			<div class="fullName">{{redirect.title}}</div>
-			<div class="fullName">{{redirect.url}}</div>
+			<div class="fullName">Title: {{redirect.title}}</div>
+			<div class="fullName">Full URL: {{redirect.url}}</div>
+			<div class="fullName">Shorty URL: <a href="{{urlheader+redirect.id}}">{{urlheader+redirect.id}}</a></div>
 		</div>
 		<div class="col-xs-6 viewBtn2">
 			<a href="/users/{{user.id}}/redirects/{{redirect.id}}/edit">
