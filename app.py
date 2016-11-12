@@ -136,7 +136,7 @@ def redirects_show(id, redirect_id):
 	found_redirect=Redirect.query.get(redirect_id)
 	found_user=User.query.get(id)
 	if os.environ.get('ENV')=="production":
-		url_header="http://"
+		url_header="http://gr-userapp.herokuapp.com/go/"
 	else:
 		url_header="http://localhost:5000/go/"
 	# if found_redirect==None:	
