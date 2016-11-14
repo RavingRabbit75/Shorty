@@ -1,10 +1,15 @@
 from flask import Flask, render_template, redirect, request, url_for
 from flask_modus import Modus
 from flask_sqlalchemy import SQLAlchemy
+# from flask import flash
+from forms import NewUser
 import os
 import random_id
+from flask_wtf.csrf import CsrfProtect
 
 app = Flask(__name__)
+
+
 
 # If we are in production, make sure we DO NOT use the debug mode
 if os.environ.get('ENV') == 'production':
@@ -15,13 +20,15 @@ if os.environ.get('ENV') == 'production':
 
 else:
     debug = True
-    app.config['SECRET_KEY'] = "abcdefghijk1234"
+    # app.config['SECRET_KEY'] = "abcdefghijk1234"
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/bitlyClone'
 
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db=SQLAlchemy(app)
 modus=Modus(app)
+CsrfProtect(app)
 
 class User(db.Model):
 	__tablename__ = "users"
@@ -96,9 +103,13 @@ def show(id):
 	return render_template("users/show.html")
 
 
-@app.route("/users/new")
+@app.route("/users/new", methods=["GET","POST"])
 def new():
-	return render_template("users/new.html")
+	form = NewUser(request.form)
+	if request.method == 'POST' and form.validate():
+		return redirect("/users", code=307)
+	
+	return render_template("users/new.html", form=form)
 
 
 @app.route("/users/<int:id>/edit")
@@ -175,9 +186,6 @@ def go_to_redirect(redirect_id):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
-
-
-
 
 
 
