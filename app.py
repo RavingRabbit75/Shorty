@@ -108,7 +108,6 @@ def new():
 	form = NewUser(request.form)
 	if request.method == 'POST' and form.validate():
 		return redirect("/users", code=307)
-	
 	return render_template("users/new.html", form=form)
 
 
