@@ -3,10 +3,14 @@
 {% block content %}
 	<h1>Edit Redirects</h1>
 	<form class="navbar-form navbar-left" action="/users/{{user.id}}/redirects/{{redirect.id}}?_method=PATCH" method="POST">
+		{{ form.csrf_token }}
 		<div class="form-group">
-			<input type="text" name="new_title" class="form-control" placeholder="Enter Title" value="{{redirect.title}}">
-			<input type="text" name="new_url" class="form-control" placeholder="Enter URL" value="{{redirect.url}}">
+			{{ form.title(class="form-control", placeholder="Enter Title", value=redirect.title) }}
+			{{ form.url(class="form-control", placeholder="Enter URL", value=redirect.url) }}
 		</div>
 		<button type="submit" class="btn btn-default">Save Changes</button>
+		<div class="form-group">
+			{{ errors }}
+		</div>
 	</form>
 {% endblock %}

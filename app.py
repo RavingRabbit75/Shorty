@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, request, url_for
 from flask_modus import Modus
 from flask_sqlalchemy import SQLAlchemy
 # from flask import flash
-from forms import NewUser
+from forms import NewUser, EditUser, NewRedirect, EditRedirect
 import os
 import random_id
 from flask_wtf.csrf import CsrfProtect
@@ -72,27 +72,39 @@ def root():
 
 @app.route("/users", methods=["GET", "POST"])
 def index():
-	if request.method=="POST":
+	form = NewUser(request.form)
+	if request.method=="POST" and form.validate():
 		new_user=User(request.form["username"])
 		db.session.add(new_user)
 		db.session.commit()
+	elif request.method=="POST":
+		error_found=next (iter (form.errors.values()))[0]
+		return render_template("users/new.html", form=form, error=error_found)
+
 	return render_template("users/index.html", users=User.query.all())
 
 
 @app.route("/users/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def show(id):
 	found_user=User.query.get(id)
+	form = EditUser(request.form)
+
 	if found_user==None:
 		return render_template("404.html"), 404
 
 	if request.method=="GET":
 		return render_template("users/show.html", user=found_user)
 
-	elif request.method == b"PATCH":
+	elif request.method == b"PATCH" and form.validate():
+		print("!!!!!")
 		found_user.username = request.form["username"]
 		db.session.add(found_user)
 		db.session.commit()
 		return redirect("/users")
+
+	elif request.method == b"PATCH":
+		error_found=next (iter (form.errors.values()))[0]
+		return render_template("users/edit.html", user=found_user, form=form, error=error_found)
 
 	elif request.method == b"DELETE":
 		db.session.delete(found_user)
@@ -103,41 +115,46 @@ def show(id):
 	return render_template("users/show.html")
 
 
-@app.route("/users/new", methods=["GET","POST"])
+@app.route("/users/new")
 def new():
-	form = NewUser(request.form)
-	if request.method == 'POST' and form.validate():
-		return redirect("/users", code=307)
-	return render_template("users/new.html", form=form)
+	form = NewUser()
+	return render_template("users/new.html", form=form, error="")
 
 
 @app.route("/users/<int:id>/edit")
 def edit(id):
 	found_user=User.query.get(id)
-	return render_template("users/edit.html", user=found_user)
+	form = EditUser(request.form)
+	return render_template("users/edit.html", user=found_user, form=form, error="")
 
 
 @app.route("/users/<int:id>/redirects", methods=["GET","POST"])
 def redirects_index(id):
-	redirect_id = random_id.random_id_generator();
-
-	if request.method=="POST":
-		new_redirect=Redirect(redirect_id,request.form["new_url"],request.form["new_title"],id)
-		db.session.add(new_redirect)
-		db.session.commit()
-
-
 	found_redirects=User.query.get(id).redirects.all()
 	found_user=User.query.get(id)
 
+	redirect_id = random_id.random_id_generator();
+	form = NewRedirect(request.form)
+	if request.method=="POST" and form.validate():
+		new_redirect=Redirect(redirect_id,request.form["url"],request.form["title"],id)
+		db.session.add(new_redirect)
+		db.session.commit()
+		return redirect(url_for("redirects_index", id=id))
+	elif request.method=="POST":
+		error_found=next (iter (form.errors.values()))[0]
+		return render_template("redirects/new.html", user=found_user, form=form, errors = error_found)
+	
+	
 	return render_template("redirects/index.html", redirects=found_redirects, user=found_user)
 
 
 
 @app.route("/users/<int:id>/redirects/new")
 def redirects_new(id):
-	found_user=User.query.get(id)
-	return render_template("redirects/new.html", user=found_user)
+	form = NewRedirect()
+	found_user=User.query.get(id)	
+	
+	return render_template("redirects/new.html", user=found_user, form=form, errors="")
 
 
 
@@ -145,6 +162,8 @@ def redirects_new(id):
 def redirects_show(id, redirect_id):
 	found_redirect=Redirect.query.get(redirect_id)
 	found_user=User.query.get(id)
+	form = EditRedirect(request.form)
+
 	if os.environ.get('ENV')=="production":
 		url_header="http://gr-usersapp.herokuapp.com/go/"
 	else:
@@ -152,13 +171,17 @@ def redirects_show(id, redirect_id):
 	# if found_redirect==None:	
 	# 	return render_template("404.html"), 404
 
-	if request.method == b"PATCH":
-		found_redirect.url = request.form["new_url"]
-		found_redirect.title = request.form["new_title"]
+	if request.method == b"PATCH" and form.validate():
+		found_redirect.url = request.form["url"]
+		found_redirect.title = request.form["title"]
 		found_redirect.user_id = id
 		db.session.add(found_redirect)
 		db.session.commit()
-		return redirect(url_for('redirects_index', id=id))
+		return redirect(url_for("redirects_index", id=id))
+
+	elif request.method == b"PATCH":
+		error_found=next (iter (form.errors.values()))[0]
+		return render_template("redirects/edit.html", redirect=found_redirect, user=found_user, form=form, errors=error_found)
 
 	elif request.method == b"DELETE":
 		db.session.delete(found_redirect)
@@ -172,8 +195,9 @@ def redirects_show(id, redirect_id):
 def redirects_edit(id,redirect_id):
 	found_user=User.query.get(id)
 	found_redirect=Redirect.query.get(redirect_id)
-	
-	return render_template("redirects/edit.html", redirect=found_redirect, user=found_user)
+	form = EditRedirect(request.form)
+
+	return render_template("redirects/edit.html", redirect=found_redirect, user=found_user, form=form, errors="")
 
 
 @app.route("/go/<redirect_id>")
