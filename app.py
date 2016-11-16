@@ -86,7 +86,7 @@ def index():
 
 @app.route("/users/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def show(id):
-	found_user=User.query.get(id)
+	found_user=User.query.get_or_404(id)
 	form = EditUser(request.form)
 
 	if found_user==None:
@@ -95,18 +95,18 @@ def show(id):
 	if request.method=="GET":
 		return render_template("users/show.html", user=found_user)
 
-	elif request.method == b"PATCH" and form.validate():
+	if request.method == b"PATCH" and form.validate():
 		print("!!!!!")
 		found_user.username = request.form["username"]
 		db.session.add(found_user)
 		db.session.commit()
 		return redirect("/users")
 
-	elif request.method == b"PATCH":
+	if request.method == b"PATCH":
 		error_found=next (iter (form.errors.values()))[0]
 		return render_template("users/edit.html", user=found_user, form=form, error=error_found)
 
-	elif request.method == b"DELETE":
+	if request.method == b"DELETE":
 		db.session.delete(found_user)
 		db.session.commit()
 		return redirect("/users")
@@ -163,6 +163,8 @@ def redirects_show(id, redirect_id):
 	found_redirect=Redirect.query.get(redirect_id)
 	found_user=User.query.get(id)
 	form = EditRedirect(request.form)
+
+	# url_header = os.environ.get('HEADER')
 
 	if os.environ.get('ENV')=="production":
 		url_header="http://gr-usersapp.herokuapp.com/go/"
